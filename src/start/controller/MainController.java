@@ -7,25 +7,34 @@ import javafx.scene.web.WebView;
 import start.EmailManager;
 import start.view.ViewManager;
 
-public class MainController extends BaseController{
+public class MainController extends BaseController {
 
-    public MainController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
+	public MainController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
 		super(emailManager, viewManager, fxmlName);
 		// TODO Auto-generated constructor stub
 	}
 
 	@FXML
-    private TreeView<?> emailsTreeView;
+	private TreeView<?> emailsTreeView;
 
-    @FXML
-    private TableView<?> emailsTableView;
+	@FXML
+	private TableView<?> emailsTableView;
 
-    @FXML
-    private WebView emailsWebView;
+	@FXML
+	private WebView emailsWebView;
 
-    @FXML
-    void optionsAction() {
+	@FXML
+	void optionsAction() {
 
-    }
+		viewManager.showOptions();
+
+	}
+
+	@FXML
+	void addAccountAction() {
+		
+		viewManager.showLogin();
+
+	}
 
 }
