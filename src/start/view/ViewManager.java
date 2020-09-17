@@ -13,6 +13,7 @@ public class ViewManager {
 
 	private EmailManager emailManager;
 	private ArrayList<Stage> stages;
+	private boolean mainInit = false;
 
 	public ViewManager(EmailManager emailManager) {
 		super();
@@ -20,8 +21,20 @@ public class ViewManager {
 		stages = new ArrayList<>();
 	}
 	
+	
+	
 	//--------------------------------------------------------------------------
 	
+	public boolean isMainInit() {
+		return mainInit;
+	}
+
+	public void setMainInit(boolean mainInit) {
+		this.mainInit = mainInit;
+	}
+
+
+
 	private ColorTheme theme = ColorTheme.DARK;
 	private FontSize fontSize = FontSize.MEDIUM;
 	
@@ -91,6 +104,7 @@ public class ViewManager {
 		BaseController controller = new MainController(emailManager, this, "Main.fxml");
 
 		init(controller);
+		mainInit = true;
 	}
 
 	public void showOptions() {
