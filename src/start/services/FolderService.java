@@ -26,7 +26,6 @@ public class FolderService extends Service<Void> {
 
 			@Override
 			protected Void call() throws Exception {
-				// TODO Auto-generated method stub
 				fetchFolders();
 				return null;
 			}
@@ -35,17 +34,16 @@ public class FolderService extends Service<Void> {
 	}
 
 	protected void fetchFolders() throws MessagingException {
-		// TODO Auto-generated method stub
 		Folder[] folders = store.getDefaultFolder().list();
 		handleFolders(folders, folderRoot);
 	}
 
 	private void handleFolders(Folder[] folders, EmailTreeItem<String> folderRoot) throws MessagingException {
-		// TODO Auto-generated method stub
 		for (Folder folder : folders) {
 			EmailTreeItem<String> item = new EmailTreeItem<String>(folder.getName());
 			folderRoot.getChildren().add(item);
 			folderRoot.setExpanded(true);
+			fetchMessages(folder, item);
 			if (folder.getType() == Folder.HOLDS_FOLDERS) {
 				Folder[] innerFolders = folder.list();
 				handleFolders(innerFolders, item);
@@ -53,4 +51,44 @@ public class FolderService extends Service<Void> {
 		}
 	}
 
+	private void fetchMessages(Folder folder, EmailTreeItem<String> item) {
+		
+		Service fetchMessages = new Service() {
+
+			@Override
+			protected Task createTask() {
+				// TODO Auto-generated method stub
+				return new Task() {
+
+					@Override
+					protected Object call() throws Exception {
+						// TODO Auto-generated method stub
+						
+						if (folder.getType() != Folder.HOLDS_FOLDERS) {
+							folder.open(Folder.READ_WRITE);
+							int size = folder.getMessageCount();
+							for (int i = size; i >0; i--) {
+//								System.out.println(folder.getMessage(i).getSubject());
+								item.addEmail(folder.getMessage(i));
+							}
+						}
+						return null;
+					}
+					
+				};
+			}
+			
+		};
+		fetchMessages.start();
+	}
+
+
 }
+
+
+
+
+
+
+
+
