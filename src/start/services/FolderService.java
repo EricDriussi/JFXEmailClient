@@ -57,18 +57,18 @@ public class FolderService extends Service<Void> {
 
 			@Override
 			protected Task createTask() {
-				// TODO Auto-generated method stub
+				
 				return new Task() {
 
 					@Override
 					protected Object call() throws Exception {
-						// TODO Auto-generated method stub
 						
 						if (folder.getType() != Folder.HOLDS_FOLDERS) {
 							folder.open(Folder.READ_WRITE);
 							int size = folder.getMessageCount();
 							for (int i = size; i >0; i--) {
 //								System.out.println(folder.getMessage(i).getSubject());
+//								System.out.println(folder.getMessage(i).getAllRecipients()[0].toString());
 								item.addEmail(folder.getMessage(i));
 							}
 						}

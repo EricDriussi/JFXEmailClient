@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.mail.Message;
 
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,17 +13,17 @@ public class MessageBean {
 
 	private SimpleStringProperty subject;
 	private SimpleStringProperty sender;
-	private SimpleStringProperty reciever;
-	private SimpleIntegerProperty size;
+	private SimpleStringProperty recipient;
+	private SimpleObjectProperty<SizeInteger> size;
 	private SimpleObjectProperty<Date> date;
 	private boolean read;
 	private Message message;
 	
-	public MessageBean(String subject, String sender, String reciever, int size, Date date, boolean read, Message message) {
+	public MessageBean(String subject, String sender, String recipient, int size, Date date, boolean read, Message message) {
 		this.subject = new SimpleStringProperty(subject);
 		this.sender = new SimpleStringProperty(sender);
-		this.reciever = new SimpleStringProperty(reciever);
-		this.size = new SimpleIntegerProperty(size);
+		this.recipient = new SimpleStringProperty(recipient);
+		this.size = new SimpleObjectProperty<SizeInteger>(new SizeInteger(size));
 		this.date = new SimpleObjectProperty<Date>(date);
 		this.read = read;
 		this.message = message;
@@ -37,11 +38,11 @@ public class MessageBean {
 		return sender.get();
 	}
 
-	public String getReciever() {
-		return reciever.getName();
+	public String getRecipient() {
+		return recipient.get();
 	}
 
-	public Integer getSize() {
+	public SizeInteger getSize() {
 		return size.get();
 	}
 
