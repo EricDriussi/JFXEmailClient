@@ -22,7 +22,7 @@ public class ViewManager {
 	
 	//--------------------------------------------------------------------------
 	
-	private ColorTheme theme = ColorTheme.LIGHT;
+	private ColorTheme theme = ColorTheme.DARK;
 	private FontSize fontSize = FontSize.MEDIUM;
 	
 

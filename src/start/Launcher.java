@@ -16,8 +16,7 @@ public class Launcher extends Application{
 	public void start(Stage stage) throws Exception {
 		// TODO Auto-generated method stub
 		ViewManager manager = new ViewManager(new EmailManager());
-		manager.showOptions();
-		manager.updateStyle();
+		manager.showLogin();
 
 		
 	}
