@@ -7,7 +7,8 @@ import javax.mail.Folder;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-public class FolderUpdater extends Service {
+//Literally just auto-updates folders
+public class FolderUpdater extends Service<Object> {
 
 	private List<Folder> folderList;
 
@@ -17,18 +18,20 @@ public class FolderUpdater extends Service {
 	}
 
 	@Override
-	protected Task createTask() {
-		return new Task() {
+	protected Task<Object> createTask() {
+		return new Task<Object>() {
 
 			@Override
 			protected Object call() throws Exception {
-				
-				for(;;){
+
+				for (;;) {
 					try {
-						Thread.sleep(5000);
+
+						// ACTUAL LOGIC
+						Thread.sleep(5000); // checks every 5 seconds
 						for (Folder folder : folderList) {
 							if (folder.getType() != Folder.HOLDS_FOLDERS && folder.isOpen()) {
-								folder.getMessageCount();
+								folder.getMessageCount(); // for new unread mail
 							}
 						}
 					} catch (Exception e) {

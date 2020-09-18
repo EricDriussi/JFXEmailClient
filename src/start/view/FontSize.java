@@ -1,5 +1,6 @@
 package start.view;
 
+//Available font size option
 public enum FontSize {
 	
 	SMALL,

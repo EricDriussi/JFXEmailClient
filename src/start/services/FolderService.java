@@ -13,6 +13,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import start.model.EmailTreeItem;
 
+//Folder behavior logic
 public class FolderService extends Service<Void> {
 
 	private Store store;
@@ -28,11 +29,10 @@ public class FolderService extends Service<Void> {
 
 	@Override
 	protected Task<Void> createTask() {
-		// TODO Auto-generated method stub
 		return new Task<Void>() {
-
 			@Override
 			protected Void call() throws Exception {
+				//Actual code in here, kinda
 				fetchFolders();
 				return null;
 			}
@@ -40,30 +40,37 @@ public class FolderService extends Service<Void> {
 		};
 	}
 
+	//Encapsulate me bby
 	protected void fetchFolders() throws MessagingException {
 		Folder[] folders = store.getDefaultFolder().list();
 		handleFolders(folders, folderRoot);
 	}
 
+	//Handles folder lists recursively
 	private void handleFolders(Folder[] folders, EmailTreeItem<String> folderRoot) throws MessagingException {
 		for (Folder folder : folders) {
 
 			folderList.add(folder);
 			EmailTreeItem<String> item = new EmailTreeItem<String>(folder.getName());
 
+			//Adds current folder to it's root
 			folderRoot.getChildren().add(item);
 			folderRoot.setExpanded(true);
 
+			//Appends appropriate messages to current folder
 			fetchMessages(folder, item);
+			
+			//Dynamic update for receiving emails
 			addMessageListenerToFolder(folder, item);
 
 			if (folder.getType() == Folder.HOLDS_FOLDERS) {
 				Folder[] innerFolders = folder.list();
-				handleFolders(innerFolders, item);
+				handleFolders(innerFolders, item); //Recursion!
 			}
 		}
 	}
-
+	
+	//Dynamic update for receiving emails
 	private void addMessageListenerToFolder(Folder folder, EmailTreeItem<String> item) {
 
 		folder.addMessageCountListener(new MessageCountListener() {
@@ -77,6 +84,8 @@ public class FolderService extends Service<Void> {
 				for (int i = 0; i < e.getMessages().length; i++) {
 					try {
 						Message message = folder.getMessage(folder.getMessageCount() - 1);
+						
+						//Adds email to top of table view upon receiving it
 						item.addEmailToTop(message);
 					} catch (MessagingException e1) {
 						e1.printStackTrace();
@@ -86,15 +95,16 @@ public class FolderService extends Service<Void> {
 		});
 
 	}
-
+	
+	//Appends appropriate messages to current folder
 	private void fetchMessages(Folder folder, EmailTreeItem<String> item) {
 
-		Service fetchMessages = new Service() {
+		Service<Object> fetchMessages = new Service<Object>() {
 
 			@Override
-			protected Task createTask() {
+			protected Task<Object> createTask() {
 
-				return new Task() {
+				return new Task<Object>() {
 
 					@Override
 					protected Object call() throws Exception {
@@ -103,8 +113,8 @@ public class FolderService extends Service<Void> {
 							folder.open(Folder.READ_WRITE);
 							int size = folder.getMessageCount();
 							for (int i = size; i > 0; i--) {
-//								System.out.println(folder.getMessage(i).getSubject());
-//								System.out.println(folder.getMessage(i).getAllRecipients()[0].toString());
+								
+								//Actual logic
 								item.addEmail(folder.getMessage(i));
 							}
 						}

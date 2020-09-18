@@ -1,5 +1,6 @@
 package start.view;
 
+//Available themes option
 public enum ColorTheme {
 
 	LIGHT, DARK, DEFAULT;

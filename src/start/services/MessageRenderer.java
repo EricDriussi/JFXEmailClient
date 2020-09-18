@@ -12,7 +12,8 @@ import javafx.concurrent.Task;
 import javafx.scene.web.WebEngine;
 import start.model.MessageBean;
 
-public class MessageRenderer extends Service {
+//Renders the email into web view panel
+public class MessageRenderer extends Service<Object> {
 
 	private MessageBean bean;
 	private WebEngine engine;
@@ -22,7 +23,9 @@ public class MessageRenderer extends Service {
 		super();
 		this.engine = engine;
 		this.buffer = new StringBuffer();
-		this.setOnSucceeded(e->{
+
+		// Only display once it's loaded/buffered
+		this.setOnSucceeded(e -> {
 			displayMessage();
 		});
 	}
@@ -30,18 +33,14 @@ public class MessageRenderer extends Service {
 	public void setMessage(MessageBean bean) {
 		this.bean = bean;
 	}
-	
-	private void displayMessage() {
-		engine.loadContent(buffer.toString());
-	}
 
 	@Override
-	protected Task createTask() {
-		return new Task() {
-
+	protected Task<Object> createTask() {
+		return new Task<Object>() {
 			@Override
 			protected Object call() throws Exception {
 				try {
+					// Encapsulate the world
 					loadMessage();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -51,19 +50,31 @@ public class MessageRenderer extends Service {
 		};
 	}
 
+	// Actual code
 	private void loadMessage() throws MessagingException, IOException {
-		buffer.setLength(0);
+
+		buffer.setLength(0);// Empty buffer beforehand
+
 		Message message = bean.getMessage();
 		String contentType = message.getContentType();
+
+		// SimpleType can be buffered directly
 		if (isSimpleType(contentType)) {
+
 			buffer.append(message.getContent().toString());
+
+			// MultipartType need to be separated
 		} else if (isMultipartType(contentType)) {
-			
+
 			Multipart part = (Multipart) message.getContent();
-			for (int i = part.getCount() -1; i >= 0; i--) {
+
+			for (int i = part.getCount() - 1; i >= 0; i--) {
+
 				BodyPart body = part.getBodyPart(i);
 				String otherContentType = body.getContentType();
-				if (isSimpleType(otherContentType)) {
+
+				if (isSimpleType(otherContentType)) { //Probably should be recursive, can't be bothered
+
 					buffer.append(body.getContent().toString());
 				}
 			}
@@ -71,6 +82,12 @@ public class MessageRenderer extends Service {
 
 	}
 
+	// Sends buffer to engine for display
+	private void displayMessage() {
+		engine.loadContent(buffer.toString());
+	}
+
+	//Checks if SimpleType
 	private boolean isSimpleType(String contentType) {
 		if (contentType.contains("TEXT/HTML") || contentType.contains("mixed") || contentType.contains("text")) {
 			return true;
@@ -79,6 +96,7 @@ public class MessageRenderer extends Service {
 		}
 	}
 
+	//Checks if Multitype
 	private boolean isMultipartType(String contentType) {
 		if (contentType.contains("multipart")) {
 			return true;

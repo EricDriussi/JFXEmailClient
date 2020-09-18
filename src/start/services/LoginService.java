@@ -13,6 +13,7 @@ import javafx.concurrent.Task;
 import start.EmailManager;
 import start.model.EmailAccount;
 
+//Login logic
 public class LoginService extends Service<LoginResult> {
 
 	EmailAccount account;
@@ -24,18 +25,35 @@ public class LoginService extends Service<LoginResult> {
 		this.manager = manager;
 	}
 
+	//Needed to extend javafx.concurrent.service - multithreading
+	@Override
+	protected Task<LoginResult> createTask() {
+
+		return new Task<LoginResult>() {
+
+			@Override
+			protected LoginResult call() throws Exception {
+				
+				return login();
+			}
+
+		};
+	}
+
+	//Actual logic
 	private LoginResult login() {
 		Authenticator authenticator = new Authenticator() {
 
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				// TODO Auto-generated method stub
-				return new PasswordAuthentication(account.getAccount(), account.getPassword());
+				return new PasswordAuthentication(account.getAccount(), account.getPassword());//Standard authentication
 			}
 
 		};
 
 		try {
+			
+			//Custom authentication and failure management
 			Session session = Session.getInstance(account.getProperties(), authenticator);
 			Store store = session.getStore("imaps");
 
@@ -43,7 +61,7 @@ public class LoginService extends Service<LoginResult> {
 					account.getPassword());
 
 			account.setStore(store);
-			manager.addEmailAccount(account);
+			manager.addEmailAccount(account);//Multi-account support
 
 		} catch (NoSuchProviderException e) {
 			e.printStackTrace();
@@ -64,20 +82,6 @@ public class LoginService extends Service<LoginResult> {
 		}
 
 		return LoginResult.SUCCESS;
-	}
-
-	@Override
-	protected Task<LoginResult> createTask() {
-
-		return new Task<LoginResult>() {
-
-			@Override
-			protected LoginResult call() throws Exception {
-
-				return login();
-			}
-
-		};
 	}
 
 }

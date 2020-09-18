@@ -3,6 +3,7 @@ package start.controller;
 import start.EmailManager;
 import start.view.ViewManager;
 
+//Basic controller for view functionality to implement in specific implementations
 public abstract class BaseController {
 
 	protected EmailManager emailManager;

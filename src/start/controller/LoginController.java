@@ -21,7 +21,6 @@ public class LoginController extends BaseController implements Initializable {
 
 	public LoginController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
 		super(emailManager, viewManager, fxmlName);
-		// TODO Auto-generated constructor stub
 	}
 
 	@FXML
@@ -40,22 +39,24 @@ public class LoginController extends BaseController implements Initializable {
 	void buttonAction() {
 
 		if (fieldsAreValid()) {
+			
 			EmailAccount account = new EmailAccount(emailField.getText(), passwordField.getText());
-
 			LoginService service = new LoginService(account, emailManager);
 
 			service.start();
+			//Defines behavior for each possible authentication result
 			service.setOnSucceeded(e -> {
+				
 				LoginResult result = service.getValue();
 
 				switch (result) {
 				case SUCCESS:
-					System.out.println("Login: " + account);
-					
+
 					if (!viewManager.isMainInit()) {
+						//Only shows main window if none is visible
 						viewManager.showMain();
 					}
-					
+
 					Stage stage = (Stage) loginButton.getScene().getWindow();
 					viewManager.closeStage(stage);
 					return;
@@ -80,6 +81,16 @@ public class LoginController extends BaseController implements Initializable {
 
 	}
 
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+
+		//Test email acc.
+		emailField.setText("testmebby267@gmail.com");
+		passwordField.setText("I3WAH%6&r9");
+
+	}
+
+	//Only checks if not empty
 	private boolean fieldsAreValid() {
 		if (emailField.getText().isEmpty()) {
 			errorLabel.setText("Empty email address!");
@@ -91,13 +102,4 @@ public class LoginController extends BaseController implements Initializable {
 		}
 		return true;
 	}
-
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-
-		emailField.setText("testmebby267@gmail.com");
-		passwordField.setText("I3WAH%6&r9");
-
-	}
-
 }

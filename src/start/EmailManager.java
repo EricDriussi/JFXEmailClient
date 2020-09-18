@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.mail.Folder;
 import javax.mail.Flags;
-import javax.mail.Flags.Flag;
 
 import start.model.EmailAccount;
 import start.model.EmailTreeItem;

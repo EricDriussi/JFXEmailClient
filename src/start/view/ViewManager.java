@@ -13,18 +13,18 @@ public class ViewManager {
 
 	private EmailManager emailManager;
 	private ArrayList<Stage> stages;
+	
 	private boolean mainInit = false;
+
+	private ColorTheme theme = ColorTheme.DARK;
+	private FontSize fontSize = FontSize.MEDIUM;
 
 	public ViewManager(EmailManager emailManager) {
 		super();
 		this.emailManager = emailManager;
 		stages = new ArrayList<>();
 	}
-	
-	
-	
-	//--------------------------------------------------------------------------
-	
+
 	public boolean isMainInit() {
 		return mainInit;
 	}
@@ -32,12 +32,6 @@ public class ViewManager {
 	public void setMainInit(boolean mainInit) {
 		this.mainInit = mainInit;
 	}
-
-
-
-	private ColorTheme theme = ColorTheme.DARK;
-	private FontSize fontSize = FontSize.MEDIUM;
-	
 
 	public ColorTheme getTheme() {
 		return theme;
@@ -55,27 +49,49 @@ public class ViewManager {
 		this.fontSize = fontSize;
 	}
 
-	
-	//--------------------------------------------------------------------------
-
-
+	//Theme handling
 	public void updateStyle() {
-		
+
 		for (Stage stage : stages) {
 			Scene scene = stage.getScene();
-			//Handle CSS!
 			scene.getStylesheets().clear();
 			scene.getStylesheets().add(getClass().getResource(ColorTheme.getCssPath(theme)).toExternalForm());
 			scene.getStylesheets().add(getClass().getResource(FontSize.getCssPath(fontSize)).toExternalForm());
 		}
-		
+
 	}
-	
+
+	//Closes selected stage
 	public void closeStage(Stage stage) {
 		stage.close();
 		stages.remove(stage);
 	}
 
+	//Sets up main controller and stage
+	public void showMain() {
+
+		BaseController controller = new MainController(emailManager, this, "Main.fxml");
+
+		init(controller);
+		mainInit = true;
+	}
+	
+	//Sets up options controller and stage
+	public void showOptions() {
+
+		BaseController controller = new OptionsController(emailManager, this, "Options.fxml");
+		init(controller);
+	}
+	
+	//Sets up login controller and stage
+	public void showLogin() {
+
+		BaseController controller = new LoginController(emailManager, this, "Login.fxml");
+
+		init(controller);
+	}
+
+	//Inits stage based on controller param
 	private void init(BaseController controller) {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource(controller.getFxmlName()));
 		loader.setController(controller);
@@ -94,31 +110,9 @@ public class ViewManager {
 		stage.setScene(scene);
 
 		stage.show();
-		
+
 		stages.add(stage);
 
 	}
-
-	public void showMain() {
-
-		BaseController controller = new MainController(emailManager, this, "Main.fxml");
-
-		init(controller);
-		mainInit = true;
-	}
-
-	public void showOptions() {
-
-		BaseController controller = new OptionsController(emailManager, this, "Options.fxml");
-		init(controller);
-	}
-
-	public void showLogin() {
-
-		BaseController controller = new LoginController(emailManager, this, "Login.fxml");
-
-		init(controller);
-	}
-
 
 }

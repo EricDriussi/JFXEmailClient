@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.mail.Store;
 
+//Bean-type class for holding account info
 public class EmailAccount {
 
 	private String account;
@@ -15,6 +16,8 @@ public class EmailAccount {
 		super();
 		this.account = account;
 		this.password = password;
+		
+		//Copied IMAP/SMTPS stuff
 		properties = new Properties();
 		properties.put("incomingHost", "imap.gmail.com");
 		properties.put("mail.store.protocol", "imaps");

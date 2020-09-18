@@ -1,5 +1,6 @@
 package start.model;
 
+//Defines specific Integer behavior for size field for table view 
 public class SizeInteger implements Comparable<SizeInteger>{
 
 	private int size;

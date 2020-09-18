@@ -19,19 +19,48 @@ public class OptionsController extends BaseController implements Initializable {
 
 	public OptionsController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
 		super(emailManager, viewManager, fxmlName);
-		// TODO Auto-generated constructor stub
+	}
+
+	@FXML
+	private Slider FontSizePicker;
+
+	@FXML
+	private ChoiceBox<ColorTheme> ThemePicker;
+
+	@FXML
+	void applyButtonAction() {
+
+		viewManager.setTheme(ThemePicker.getValue());
+		viewManager.setFontSize(FontSize.values()[(int) (FontSizePicker.getValue())]);
+		viewManager.updateStyle();
+
+	}
+
+	@FXML
+	void cancelButtonAction() {
+
+		Stage stage = (Stage) FontSizePicker.getScene().getWindow();
+		viewManager.closeStage(stage);
+
 	}
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		// TODO Auto-generated method stub
 		setUpTheme();
 		setUpFontSize();
 
 	}
 
+	private void setUpTheme() {
+
+		ThemePicker.setItems(FXCollections.observableArrayList(ColorTheme.values()));
+		ThemePicker.setValue(viewManager.getTheme());
+
+	}
+
 	private void setUpFontSize() {
-		
+
+		//Setting slider behavior
 		FontSizePicker.setMin(0);
 		FontSizePicker.setMax(FontSize.values().length - 1);
 		FontSizePicker.setValue(viewManager.getFontSize().ordinal());
@@ -42,54 +71,23 @@ public class OptionsController extends BaseController implements Initializable {
 		FontSizePicker.setShowTickMarks(true);
 		FontSizePicker.setShowTickLabels(true);
 		FontSizePicker.setLabelFormatter(new StringConverter<Double>() {
-			
+
 			@Override
 			public String toString(Double arg0) {
 				int i = arg0.intValue();
 				return FontSize.values()[i].toString();
 			}
-			
+
 			@Override
 			public Double fromString(String arg0) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 		});
-		FontSizePicker.valueProperty().addListener((obs, oldVal, newVal)->{
+		
+		//Actually sets value
+		FontSizePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
 			FontSizePicker.setValue(newVal.intValue());
 		});
-		
-	}
-
-	private void setUpTheme() {
-
-		ThemePicker.setItems(FXCollections.observableArrayList(ColorTheme.values()));
-		ThemePicker.setValue(viewManager.getTheme());
-
-	}
-
-	@FXML
-	private Slider FontSizePicker;
-
-	@FXML
-	private ChoiceBox<ColorTheme> ThemePicker;
-
-
-    
-	@FXML
-	void applyButtonAction() {
-		
-		viewManager.setTheme(ThemePicker.getValue());
-		viewManager.setFontSize(FontSize.values()[(int)(FontSizePicker.getValue())]);
-		viewManager.updateStyle();
-
-	}
-
-	@FXML
-	void cancelButtonAction() {
-		
-		Stage stage = (Stage) FontSizePicker.getScene().getWindow();
-		viewManager.closeStage(stage);
 
 	}
 

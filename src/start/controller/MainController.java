@@ -24,14 +24,13 @@ import start.view.ViewManager;
 
 public class MainController extends BaseController implements Initializable {
 
-	public MainController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
-		super(emailManager, viewManager, fxmlName);
-		// TODO Auto-generated constructor stub
-	}
-	
+	// Context menu items
 	private MenuItem markUnread = new MenuItem("Mark as unread");
 	private MenuItem deleteMessage = new MenuItem("Delete message");
-	
+
+	public MainController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
+		super(emailManager, viewManager, fxmlName);
+	}
 
 	@FXML
 	private TreeView<String> emailsTreeView;
@@ -84,42 +83,38 @@ public class MainController extends BaseController implements Initializable {
 		setUpContextMenu();
 	}
 
-	private void setUpContextMenu() {
-		
-		markUnread.setOnAction(e->{
-			emailManager.setRead(false);
-		});
-		
-		deleteMessage.setOnAction(e->{
-			emailManager.deleteSelectedMessage();
-			emailsWebView.getEngine().loadContent("");
-		});
+	//Left-most panel
+	private void setUpTree() {
+		emailsTreeView.setRoot(emailManager.getFoldersRoot());
+		emailsTreeView.setShowRoot(false);
+
 	}
 
-	private void setUpMessageSelection() {
+	//Upper panel: gets properties from MessageBean
+	private void setUpTableView() {
+		senderCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("sender"));
+		subjectCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("subject"));
+		recipientCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("recipient"));
+		sizeCol.setCellValueFactory(new PropertyValueFactory<MessageBean, SizeInteger>("size"));
+		dateCol.setCellValueFactory(new PropertyValueFactory<MessageBean, Date>("date"));
 
-		emailsTableView.setOnMouseClicked(e -> {
-			MessageBean bean = emailsTableView.getSelectionModel().getSelectedItem();
-			if (bean != null) {
-				emailManager.setSelectedMessage(bean);
-				
-				if (!bean.isRead()) {
-					emailManager.setRead(true);
-				}
-				
-				renderer.setMessage(bean);
-				renderer.restart();
+		emailsTableView.setContextMenu(new ContextMenu(markUnread, deleteMessage));
 
+	}
+
+	//Modifies table view depending on selected folder on left panel
+	private void setUpFolderSelection() {
+		emailsTreeView.setOnMouseClicked(e -> {
+			EmailTreeItem<String> item = (EmailTreeItem<String>) emailsTreeView.getSelectionModel().getSelectedItem();
+			if (item != null) {
+				emailManager.setSelectedFolder(item);
+				emailsTableView.setItems(item.getMessages());
 			}
 		});
 
 	}
 
-	private void setUpRenderer() {
-		renderer = new MessageRenderer(emailsWebView.getEngine());
-
-	}
-
+	//Fonts are a pain in the ass
 	private void setUpBoldRows() {
 
 		emailsTableView.setRowFactory(new Callback<TableView<MessageBean>, TableRow<MessageBean>>() {
@@ -132,6 +127,7 @@ public class MainController extends BaseController implements Initializable {
 					protected void updateItem(MessageBean item, boolean empty) {
 						super.updateItem(item, empty);
 
+						//Actual logic...
 						if (item != null) {
 							if (item.isRead()) {
 								setStyle("");
@@ -147,32 +143,42 @@ public class MainController extends BaseController implements Initializable {
 
 	}
 
-	private void setUpFolderSelection() {
-		emailsTreeView.setOnMouseClicked(e -> {
-			EmailTreeItem<String> item = (EmailTreeItem<String>) emailsTreeView.getSelectionModel().getSelectedItem();
-			if (item != null) {
-				emailManager.setSelectedFolder(item);
-				emailsTableView.setItems(item.getMessages());
+	//Sets up renderer based on viewing panel (bottom)
+	private void setUpRenderer() {
+		renderer = new MessageRenderer(emailsWebView.getEngine());
+
+	}
+
+	//Tells renderer which message to render (table view -> web view)
+	private void setUpMessageSelection() {
+
+		emailsTableView.setOnMouseClicked(e -> {
+			MessageBean bean = emailsTableView.getSelectionModel().getSelectedItem();
+			if (bean != null) {
+				emailManager.setSelectedMessage(bean);
+
+				if (!bean.isRead()) {
+					emailManager.setRead(true);
+				}
+
+				renderer.setMessage(bean);
+				renderer.restart();
+
 			}
 		});
 
 	}
 
-	private void setUpTableView() {
-		senderCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("sender"));
-		subjectCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("subject"));
-		recipientCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("recipient"));
-		sizeCol.setCellValueFactory(new PropertyValueFactory<MessageBean, SizeInteger>("size"));
-		dateCol.setCellValueFactory(new PropertyValueFactory<MessageBean, Date>("date"));
-		
-		emailsTableView.setContextMenu(new ContextMenu(markUnread, deleteMessage));
+	private void setUpContextMenu() {
 
-	}
+		markUnread.setOnAction(e -> {
+			emailManager.setRead(false);
+		});
 
-	private void setUpTree() {
-		emailsTreeView.setRoot(emailManager.getFoldersRoot());
-		emailsTreeView.setShowRoot(false);
-
+		deleteMessage.setOnAction(e -> {
+			emailManager.deleteSelectedMessage();
+			emailsWebView.getEngine().loadContent("");
+		});
 	}
 
 }
