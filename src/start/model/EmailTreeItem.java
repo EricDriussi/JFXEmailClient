@@ -29,21 +29,45 @@ public class EmailTreeItem<String> extends TreeItem<String> {
 
 	public void addEmail(Message message) throws MessagingException {
 
+		
+		messages.add(fetchMessage(message));
+
+	}
+	
+	public void addEmailToTop(Message message) throws MessagingException {
+		
+		messages.add(0, fetchMessage(message));
+		
+		
+		
+	}
+
+
+	private MessageBean fetchMessage(Message message) throws MessagingException {
 		boolean read = message.getFlags().contains(Flags.Flag.SEEN);
 
 		MessageBean bean = new MessageBean(message.getSubject(), message.getFrom()[0].toString(),
 				message.getRecipients(MimeMessage.RecipientType.TO)[0].toString(), message.getSize(),
 				message.getSentDate(), read, message);
-		messages.add(bean);
 		if (!read) {
-			unreadCount++;
-			updateCount();
+			incrementCount();
 		}
+		return bean;
+	}
+	
+	public void incrementCount() {
+		unreadCount++;
+		updateName();
+	}
+
+	public void decrementCount() {
+		unreadCount--;
+		updateName();
 	}
 	
 	
 
-	private void updateCount() {
+	private void updateName() {
 		if (unreadCount > 0) {
 			this.setValue((String) (name + " ( " + unreadCount + " ) "));
 			
@@ -51,5 +75,8 @@ public class EmailTreeItem<String> extends TreeItem<String> {
 			this.setValue(name);
 		}
 	}
+
+
+	
 
 }
