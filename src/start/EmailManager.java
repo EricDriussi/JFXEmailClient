@@ -4,36 +4,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.Folder;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import javax.mail.Flags;
 
-import start.model.EmailAccount;
-import start.model.EmailTreeItem;
-import start.model.MessageBean;
-import start.services.FolderService;
-import start.services.FolderUpdater;
+import start.model.EmailAccountModel;
+import start.model.TreeItemModel;
+import start.model.MessageModel;
+import start.services.FolderGeneralService;
+import start.services.FolderUpdaterService;
 
+// Handle the folders and accounts
 public class EmailManager {
 
-	// Handle the folders
-	private EmailTreeItem<String> foldersRoot = new EmailTreeItem<String>("");
+	private TreeItemModel<String> foldersRoot = new TreeItemModel<String>("");
 	private List<Folder> folderList = new ArrayList<Folder>();
-	private FolderUpdater updater;
-	private MessageBean selectedMessage;
-	private EmailTreeItem<String> selectedFolder;
+	private FolderUpdaterService updater;
+	private MessageModel selectedMessage;
+	private TreeItemModel<String> selectedFolder;
+	private ObservableList<EmailAccountModel> emailAccounts = FXCollections.observableArrayList();
 
-	public MessageBean getSelectedMessage() {
+	public EmailManager() {
+		updater = new FolderUpdaterService(folderList);
+		updater.start();
+	}
+
+	public MessageModel getSelectedMessage() {
 		return selectedMessage;
 	}
 
-	public void setSelectedMessage(MessageBean selectedMessage) {
+	public void setSelectedMessage(MessageModel selectedMessage) {
 		this.selectedMessage = selectedMessage;
 	}
 
-	public EmailTreeItem<String> getSelectedFolder() {
+	public TreeItemModel<String> getSelectedFolder() {
 		return selectedFolder;
 	}
 
-	public void setSelectedFolder(EmailTreeItem<String> selectedFolder) {
+	public void setSelectedFolder(TreeItemModel<String> selectedFolder) {
 		this.selectedFolder = selectedFolder;
 	}
 
@@ -41,26 +51,26 @@ public class EmailManager {
 		return folderList;
 	}
 
-	public EmailManager() {
-		updater = new FolderUpdater(folderList);
-		updater.start();
-	}
-
-	public EmailTreeItem<String> getFoldersRoot() {
+	public TreeItemModel<String> getFoldersRoot() {
 		return foldersRoot;
 	}
 
-	public void setFoldersRoot(EmailTreeItem<String> foldersRoot) {
+	public void setFoldersRoot(TreeItemModel<String> foldersRoot) {
 		this.foldersRoot = foldersRoot;
 	}
+	
+	public ObservableList<EmailAccountModel> getEmailAccounts(){
+		return emailAccounts;
+	}
 
-	public void addEmailAccount(EmailAccount account) {
-		EmailTreeItem<String> item = new EmailTreeItem<String>(account.getAccount());
-		FolderService folderService = new FolderService(account.getStore(), item, folderList);
+	public void addEmailAccount(EmailAccountModel account) {
+		emailAccounts.add(account);
+		TreeItemModel<String> item = new TreeItemModel<String>(account.getAccount());
+		FolderGeneralService folderService = new FolderGeneralService(account.getStore(), item, folderList);
 		folderService.start();
 		foldersRoot.getChildren().add(item);
 	}
-	
+
 	public void deleteSelectedMessage() {
 		try {
 			selectedMessage.getMessage().setFlag(Flags.Flag.DELETED, true);

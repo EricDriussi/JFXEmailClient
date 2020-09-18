@@ -10,16 +10,16 @@ import javax.mail.Multipart;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.web.WebEngine;
-import start.model.MessageBean;
+import start.model.MessageModel;
 
 //Renders the email into web view panel
-public class MessageRenderer extends Service<Object> {
+public class RendererService extends Service<Object> {
 
-	private MessageBean bean;
+	private MessageModel bean;
 	private WebEngine engine;
 	private StringBuffer buffer;
 
-	public MessageRenderer(WebEngine engine) {
+	public RendererService(WebEngine engine) {
 		super();
 		this.engine = engine;
 		this.buffer = new StringBuffer();
@@ -30,7 +30,7 @@ public class MessageRenderer extends Service<Object> {
 		});
 	}
 
-	public void setMessage(MessageBean bean) {
+	public void setMessage(MessageModel bean) {
 		this.bean = bean;
 	}
 

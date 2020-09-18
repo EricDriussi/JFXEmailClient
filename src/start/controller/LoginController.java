@@ -12,7 +12,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import start.EmailManager;
-import start.model.EmailAccount;
+import start.model.EmailAccountModel;
 import start.services.LoginResult;
 import start.services.LoginService;
 import start.view.ViewManager;
@@ -40,7 +40,7 @@ public class LoginController extends BaseController implements Initializable {
 
 		if (fieldsAreValid()) {
 			
-			EmailAccount account = new EmailAccount(emailField.getText(), passwordField.getText());
+			EmailAccountModel account = new EmailAccountModel(emailField.getText(), passwordField.getText());
 			LoginService service = new LoginService(account, emailManager);
 
 			service.start();

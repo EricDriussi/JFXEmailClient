@@ -8,11 +8,11 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 //Literally just auto-updates folders
-public class FolderUpdater extends Service<Object> {
+public class FolderUpdaterService extends Service<Object> {
 
 	private List<Folder> folderList;
 
-	public FolderUpdater(List<Folder> folderList) {
+	public FolderUpdaterService(List<Folder> folderList) {
 		super();
 		this.folderList = folderList;
 	}

@@ -16,10 +16,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 import start.EmailManager;
-import start.model.EmailTreeItem;
-import start.model.MessageBean;
-import start.model.SizeInteger;
-import start.services.MessageRenderer;
+import start.model.TreeItemModel;
+import start.model.MessageModel;
+import start.model.SizeIntegerModel;
+import start.services.RendererService;
 import start.view.ViewManager;
 
 public class MainController extends BaseController implements Initializable {
@@ -36,27 +36,27 @@ public class MainController extends BaseController implements Initializable {
 	private TreeView<String> emailsTreeView;
 
 	@FXML
-	private TableView<MessageBean> emailsTableView;
+	private TableView<MessageModel> emailsTableView;
 
 	@FXML
 	private WebView emailsWebView;
 
-	private MessageRenderer renderer;
+	private RendererService renderer;
 
 	@FXML
-	private TableColumn<MessageBean, String> senderCol;
+	private TableColumn<MessageModel, String> senderCol;
 
 	@FXML
-	private TableColumn<MessageBean, String> subjectCol;
+	private TableColumn<MessageModel, String> subjectCol;
 
 	@FXML
-	private TableColumn<MessageBean, String> recipientCol;
+	private TableColumn<MessageModel, String> recipientCol;
 
 	@FXML
-	private TableColumn<MessageBean, SizeInteger> sizeCol;
+	private TableColumn<MessageModel, SizeIntegerModel> sizeCol;
 
 	@FXML
-	private TableColumn<MessageBean, Date> dateCol;
+	private TableColumn<MessageModel, Date> dateCol;
 
 	@FXML
 	void optionsAction() {
@@ -71,6 +71,11 @@ public class MainController extends BaseController implements Initializable {
 		viewManager.showLogin();
 
 	}
+
+    @FXML
+    void composeAction() {
+    	viewManager.showCompose();
+    }
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -92,11 +97,11 @@ public class MainController extends BaseController implements Initializable {
 
 	//Upper panel: gets properties from MessageBean
 	private void setUpTableView() {
-		senderCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("sender"));
-		subjectCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("subject"));
-		recipientCol.setCellValueFactory(new PropertyValueFactory<MessageBean, String>("recipient"));
-		sizeCol.setCellValueFactory(new PropertyValueFactory<MessageBean, SizeInteger>("size"));
-		dateCol.setCellValueFactory(new PropertyValueFactory<MessageBean, Date>("date"));
+		senderCol.setCellValueFactory(new PropertyValueFactory<MessageModel, String>("sender"));
+		subjectCol.setCellValueFactory(new PropertyValueFactory<MessageModel, String>("subject"));
+		recipientCol.setCellValueFactory(new PropertyValueFactory<MessageModel, String>("recipient"));
+		sizeCol.setCellValueFactory(new PropertyValueFactory<MessageModel, SizeIntegerModel>("size"));
+		dateCol.setCellValueFactory(new PropertyValueFactory<MessageModel, Date>("date"));
 
 		emailsTableView.setContextMenu(new ContextMenu(markUnread, deleteMessage));
 
@@ -105,7 +110,7 @@ public class MainController extends BaseController implements Initializable {
 	//Modifies table view depending on selected folder on left panel
 	private void setUpFolderSelection() {
 		emailsTreeView.setOnMouseClicked(e -> {
-			EmailTreeItem<String> item = (EmailTreeItem<String>) emailsTreeView.getSelectionModel().getSelectedItem();
+			TreeItemModel<String> item = (TreeItemModel<String>) emailsTreeView.getSelectionModel().getSelectedItem();
 			if (item != null) {
 				emailManager.setSelectedFolder(item);
 				emailsTableView.setItems(item.getMessages());
@@ -117,14 +122,14 @@ public class MainController extends BaseController implements Initializable {
 	//Fonts are a pain in the ass
 	private void setUpBoldRows() {
 
-		emailsTableView.setRowFactory(new Callback<TableView<MessageBean>, TableRow<MessageBean>>() {
+		emailsTableView.setRowFactory(new Callback<TableView<MessageModel>, TableRow<MessageModel>>() {
 
 			@Override
-			public TableRow<MessageBean> call(TableView<MessageBean> arg0) {
-				return new TableRow<MessageBean>() {
+			public TableRow<MessageModel> call(TableView<MessageModel> arg0) {
+				return new TableRow<MessageModel>() {
 
 					@Override
-					protected void updateItem(MessageBean item, boolean empty) {
+					protected void updateItem(MessageModel item, boolean empty) {
 						super.updateItem(item, empty);
 
 						//Actual logic...
@@ -145,7 +150,7 @@ public class MainController extends BaseController implements Initializable {
 
 	//Sets up renderer based on viewing panel (bottom)
 	private void setUpRenderer() {
-		renderer = new MessageRenderer(emailsWebView.getEngine());
+		renderer = new RendererService(emailsWebView.getEngine());
 
 	}
 
@@ -153,7 +158,7 @@ public class MainController extends BaseController implements Initializable {
 	private void setUpMessageSelection() {
 
 		emailsTableView.setOnMouseClicked(e -> {
-			MessageBean bean = emailsTableView.getSelectionModel().getSelectedItem();
+			MessageModel bean = emailsTableView.getSelectionModel().getSelectedItem();
 			if (bean != null) {
 				emailManager.setSelectedMessage(bean);
 

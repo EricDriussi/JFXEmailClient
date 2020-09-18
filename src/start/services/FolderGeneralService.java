@@ -11,16 +11,16 @@ import javax.mail.event.MessageCountListener;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import start.model.EmailTreeItem;
+import start.model.TreeItemModel;
 
 //Folder behavior logic
-public class FolderService extends Service<Void> {
+public class FolderGeneralService extends Service<Void> {
 
 	private Store store;
-	private EmailTreeItem<String> folderRoot;
+	private TreeItemModel<String> folderRoot;
 	private List<Folder> folderList;
 
-	public FolderService(Store store, EmailTreeItem<String> folderRoot, List<Folder> folderList) {
+	public FolderGeneralService(Store store, TreeItemModel<String> folderRoot, List<Folder> folderList) {
 		super();
 		this.store = store;
 		this.folderRoot = folderRoot;
@@ -47,11 +47,11 @@ public class FolderService extends Service<Void> {
 	}
 
 	//Handles folder lists recursively
-	private void handleFolders(Folder[] folders, EmailTreeItem<String> folderRoot) throws MessagingException {
+	private void handleFolders(Folder[] folders, TreeItemModel<String> folderRoot) throws MessagingException {
 		for (Folder folder : folders) {
 
 			folderList.add(folder);
-			EmailTreeItem<String> item = new EmailTreeItem<String>(folder.getName());
+			TreeItemModel<String> item = new TreeItemModel<String>(folder.getName());
 
 			//Adds current folder to it's root
 			folderRoot.getChildren().add(item);
@@ -71,7 +71,7 @@ public class FolderService extends Service<Void> {
 	}
 	
 	//Dynamic update for receiving emails
-	private void addMessageListenerToFolder(Folder folder, EmailTreeItem<String> item) {
+	private void addMessageListenerToFolder(Folder folder, TreeItemModel<String> item) {
 
 		folder.addMessageCountListener(new MessageCountListener() {
 
@@ -97,7 +97,7 @@ public class FolderService extends Service<Void> {
 	}
 	
 	//Appends appropriate messages to current folder
-	private void fetchMessages(Folder folder, EmailTreeItem<String> item) {
+	private void fetchMessages(Folder folder, TreeItemModel<String> item) {
 
 		Service<Object> fetchMessages = new Service<Object>() {
 

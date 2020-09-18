@@ -2,27 +2,27 @@ package start.model;
 
 import javax.mail.Flags;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 //Custom TreeItem behavior for left-most panel
-public class EmailTreeItem<String> extends TreeItem<String> {
+public class TreeItemModel<String> extends TreeItem<String> {
 
 	private String name;
-	private ObservableList<MessageBean> messages;
+	private ObservableList<MessageModel> messages;
 	private int unreadCount;
 
-	public EmailTreeItem(String name) {
+	public TreeItemModel(String name) {
 		super(name);
 		this.name = name;
 		this.messages = FXCollections.observableArrayList();
 	}
 
-	public ObservableList<MessageBean> getMessages() {
+	public ObservableList<MessageModel> getMessages() {
 		return messages;
 	}
 
@@ -60,13 +60,13 @@ public class EmailTreeItem<String> extends TreeItem<String> {
 	}
 
 	// Processes standard messages into MessageBeans and updates unread marker
-	private MessageBean fetchMessage(Message message) throws MessagingException {
+	private MessageModel fetchMessage(Message message) throws MessagingException {
 		// Determines if read
 		boolean read = message.getFlags().contains(Flags.Flag.SEEN);
 
 		// Message - MessageBean conversion
-		MessageBean bean = new MessageBean(message.getSubject(), message.getFrom()[0].toString(),
-				message.getRecipients(MimeMessage.RecipientType.TO)[0].toString(), message.getSize(),
+		MessageModel bean = new MessageModel(message.getSubject(), message.getFrom()[0].toString(),
+				message.getRecipients(RecipientType.TO)[0].toString(), message.getSize(),
 				message.getSentDate(), read, message);
 
 		// Updates unread marker if unread

@@ -11,15 +11,15 @@ import javax.mail.Store;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import start.EmailManager;
-import start.model.EmailAccount;
+import start.model.EmailAccountModel;
 
 //Login logic
 public class LoginService extends Service<LoginResult> {
 
-	EmailAccount account;
+	EmailAccountModel account;
 	EmailManager manager;
 
-	public LoginService(EmailAccount account, EmailManager manager) {
+	public LoginService(EmailAccountModel account, EmailManager manager) {
 		super();
 		this.account = account;
 		this.manager = manager;
@@ -55,6 +55,9 @@ public class LoginService extends Service<LoginResult> {
 			
 			//Custom authentication and failure management
 			Session session = Session.getInstance(account.getProperties(), authenticator);
+			
+			account.setSession(session);
+			
 			Store store = session.getStore("imaps");
 
 			store.connect(account.getProperties().getProperty("incomingHost"), account.getAccount(),

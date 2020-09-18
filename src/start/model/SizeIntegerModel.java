@@ -1,11 +1,11 @@
 package start.model;
 
 //Defines specific Integer behavior for size field for table view 
-public class SizeInteger implements Comparable<SizeInteger>{
+public class SizeIntegerModel implements Comparable<SizeIntegerModel>{
 
 	private int size;
 
-	public SizeInteger(int size) {
+	public SizeIntegerModel(int size) {
 		super();
 		this.size = size;
 	}
@@ -24,7 +24,7 @@ public class SizeInteger implements Comparable<SizeInteger>{
     }
 
     @Override
-    public int compareTo(SizeInteger o) {
+    public int compareTo(SizeIntegerModel o) {
         if(size > o.size) {
             return 1;
         } else if(o.size > size) {
