@@ -12,6 +12,7 @@ import javax.mail.event.MessageCountListener;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import start.model.TreeItemModel;
+import start.view.IconReader;
 
 //Folder behavior logic
 public class FolderGeneralService extends Service<Void> {
@@ -19,6 +20,7 @@ public class FolderGeneralService extends Service<Void> {
 	private Store store;
 	private TreeItemModel<String> folderRoot;
 	private List<Folder> folderList;
+	private IconReader iconReader = new IconReader();
 
 	public FolderGeneralService(Store store, TreeItemModel<String> folderRoot, List<Folder> folderList) {
 		super();
@@ -52,6 +54,7 @@ public class FolderGeneralService extends Service<Void> {
 
 			folderList.add(folder);
 			TreeItemModel<String> item = new TreeItemModel<String>(folder.getName());
+			item.setGraphic(iconReader.getIcon(folder.getName()));
 
 			//Adds current folder to it's root
 			folderRoot.getChildren().add(item);

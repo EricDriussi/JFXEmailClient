@@ -15,6 +15,7 @@ import start.model.TreeItemModel;
 import start.model.MessageModel;
 import start.services.FolderGeneralService;
 import start.services.FolderUpdaterService;
+import start.view.IconReader;
 
 // Handle the folders and accounts
 public class EmailManager {
@@ -25,6 +26,7 @@ public class EmailManager {
 	private MessageModel selectedMessage;
 	private TreeItemModel<String> selectedFolder;
 	private ObservableList<EmailAccountModel> emailAccounts = FXCollections.observableArrayList();
+	private IconReader iconReader = new IconReader();
 
 	public EmailManager() {
 		updater = new FolderUpdaterService(folderList);
@@ -66,6 +68,7 @@ public class EmailManager {
 	public void addEmailAccount(EmailAccountModel account) {
 		emailAccounts.add(account);
 		TreeItemModel<String> item = new TreeItemModel<String>(account.getAccount());
+		item.setGraphic(iconReader.getIcon(account.getAccount()));
 		FolderGeneralService folderService = new FolderGeneralService(account.getStore(), item, folderList);
 		folderService.start();
 		foldersRoot.getChildren().add(item);
