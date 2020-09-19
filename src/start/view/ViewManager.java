@@ -16,7 +16,7 @@ public class ViewManager {
 
 	private boolean mainInit = false;
 
-	private ColorTheme theme = ColorTheme.DARK;
+	private ColorTheme theme = ColorTheme.DEFAULT;
 	private FontSize fontSize = FontSize.MEDIUM;
 
 	public ViewManager(EmailManager emailManager) {
