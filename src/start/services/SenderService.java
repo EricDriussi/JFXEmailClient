@@ -1,5 +1,11 @@
 package start.services;
 
+import java.io.File;
+import java.util.List;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -8,7 +14,6 @@ import javax.mail.Transport;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -21,13 +26,16 @@ public class SenderService extends Service<SendingResult> {
 	private String subject;
 	private String recipient;
 	private String content;
+	private List<File> attachments;
 
-	public SenderService(EmailAccountModel emailAccount, String subject, String recipient, String content) {
+	public SenderService(EmailAccountModel emailAccount, String subject, String recipient, String content,
+			List<File> attachments) {
 		super();
 		this.emailAccount = emailAccount;
 		this.subject = subject;
 		this.recipient = recipient;
 		this.content = content;
+		this.attachments = attachments;
 	}
 
 	@Override
@@ -52,6 +60,19 @@ public class SenderService extends Service<SendingResult> {
 
 					mimeMessage.setContent(multi);
 
+					// Attachments
+					if (attachments.size() > 0) {
+						for (File file : attachments) {
+							System.out.println(file.getAbsolutePath());
+
+							MimeBodyPart part = new MimeBodyPart();
+							DataSource source = new FileDataSource(file.getAbsolutePath());
+							part.setDataHandler(new DataHandler(source));
+							part.setFileName(file.getName());
+							multi.addBodyPart(part);
+						}
+					}
+
 					// Sends the message
 					Transport transport = emailAccount.getSession().getTransport();
 					transport.connect(emailAccount.getProperties().getProperty("outgoingHost"),
@@ -59,7 +80,7 @@ public class SenderService extends Service<SendingResult> {
 
 					transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
 					transport.close();
-					
+
 					return SendingResult.SUCCESS;
 				} catch (MessagingException e) {
 					e.printStackTrace();

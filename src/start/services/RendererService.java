@@ -6,6 +6,7 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -15,7 +16,7 @@ import start.model.MessageModel;
 //Renders the email into web view panel
 public class RendererService extends Service<Object> {
 
-	private MessageModel bean;
+	private MessageModel myMessage;
 	private WebEngine engine;
 	private StringBuffer buffer;
 
@@ -30,8 +31,8 @@ public class RendererService extends Service<Object> {
 		});
 	}
 
-	public void setMessage(MessageModel bean) {
-		this.bean = bean;
+	public void setMessage(MessageModel myMessage) {
+		this.myMessage = myMessage;
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class RendererService extends Service<Object> {
 
 		buffer.setLength(0);// Empty buffer beforehand
 
-		Message message = bean.getMessage();
+		Message message = myMessage.getMessage();
 		String contentType = message.getContentType();
 
 		// SimpleType can be buffered directly
@@ -68,18 +69,35 @@ public class RendererService extends Service<Object> {
 
 			Multipart part = (Multipart) message.getContent();
 
-			for (int i = part.getCount() - 1; i >= 0; i--) {
-
-				BodyPart body = part.getBodyPart(i);
-				String otherContentType = body.getContentType();
-
-				if (isSimpleType(otherContentType)) { //Probably should be recursive, can't be bothered
-
-					buffer.append(body.getContent().toString());
-				}
-			}
+			loadMultipart(part, buffer);
 		}
 
+	}
+
+	// Recursive method for multiparts of multiparts...
+	private void loadMultipart(Multipart multipart, StringBuffer buffer) throws MessagingException, IOException {
+
+		for (int i = multipart.getCount() - 1; i >= 0; i--) {
+
+			BodyPart body = multipart.getBodyPart(i);
+			String otherContentType = body.getContentType();
+
+			if (isSimpleType(otherContentType)) {
+
+				buffer.append(body.getContent().toString());
+			} else if (isMultipartType(body.getContentType())) {
+
+				// Recursion
+				Multipart part = (Multipart) body.getContent();
+				loadMultipart(part, buffer);
+
+			} else if (!isPlainText(otherContentType)) {
+
+				//Ads attachment to email
+				MimeBodyPart mbp = (MimeBodyPart) body;
+				myMessage.addAttachment(mbp);
+			}
+		}
 	}
 
 	// Sends buffer to engine for display
@@ -87,7 +105,7 @@ public class RendererService extends Service<Object> {
 		engine.loadContent(buffer.toString());
 	}
 
-	//Checks if SimpleType
+	// Checks if SimpleType
 	private boolean isSimpleType(String contentType) {
 		if (contentType.contains("TEXT/HTML") || contentType.contains("mixed") || contentType.contains("text")) {
 			return true;
@@ -96,13 +114,18 @@ public class RendererService extends Service<Object> {
 		}
 	}
 
-	//Checks if Multitype
+	// Checks if Multitype
 	private boolean isMultipartType(String contentType) {
 		if (contentType.contains("multipart")) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	// Checks if attachment
+	private boolean isPlainText(String contenType) {
+		return contenType.contains("TEXT/PLAIN");
 	}
 
 }

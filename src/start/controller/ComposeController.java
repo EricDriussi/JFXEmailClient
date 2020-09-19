@@ -1,7 +1,11 @@
 package start.controller;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+
 
 import javafx.fxml.FXML;
 import javafx.stage.*;
@@ -21,6 +25,8 @@ public class ComposeController extends BaseController implements Initializable {
 	public ComposeController(EmailManager emailManager, ViewManager viewManager, String fxmlName) {
 		super(emailManager, viewManager, fxmlName);
 	}
+	
+	private List<File> attachments= new ArrayList<File>();
 
 	@FXML
 	private TextField recipientTextField;
@@ -39,9 +45,10 @@ public class ComposeController extends BaseController implements Initializable {
 
 	@FXML
 	void sendAction() {
-
+		
+		
 		SenderService sender = new SenderService(accountChoice.getValue(), subjectTextField.getText(),
-				recipientTextField.getText(), htmlEditor.getHtmlText());
+				recipientTextField.getText(), htmlEditor.getHtmlText(), attachments);
 		sender.start();
 		sender.setOnSucceeded(e -> {
 			SendingResult result = sender.getValue();
@@ -64,6 +71,20 @@ public class ComposeController extends BaseController implements Initializable {
 				break;
 			}
 		});
+	}
+
+	@FXML
+	void attachAction() {
+		
+		FileChooser chooser = new FileChooser();
+		File selected = chooser.showOpenDialog(null);
+		
+		if (selected != null) {
+			
+			attachments.add(selected);
+			
+		}
+
 	}
 
 	@Override
