@@ -84,9 +84,9 @@ public class LoginController extends BaseController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 
-		//Test email acc.
-		emailField.setText("testmebby267@gmail.com");
-		passwordField.setText("I3WAH%6&r9");
+//		Test email acc.
+//		emailField.setText("testmebby267@gmail.com");
+//		passwordField.setText("I3WAH%6&r9");
 
 	}
 
